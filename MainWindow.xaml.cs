@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace projektaflevering
@@ -17,8 +16,6 @@ namespace projektaflevering
 
         double TotalH => (SlutTime - StartTime) * TimePixelH;
 
-
-
         readonly List<SkemaBlok> _events = new List<SkemaBlok>
         {
             new SkemaBlok(0,  9, 20, 12, 50, "Software arkitektur"),
@@ -30,45 +27,66 @@ namespace projektaflevering
         };
 
         readonly Canvas[] _dagCanvases = new Canvas[7];
+        bool _erUnderviser;
 
-        public MainWindow()
+        // Konstruktør tager imod om brugeren er underviser
+        public MainWindow(bool erUnderviser)
         {
             InitializeComponent();
+            _erUnderviser = erUnderviser;
+
+            // Vis kun "Tilføj begivenhed"-knappen for undervisere
+            if (_erUnderviser)
+            {
+                UnderviserPanel.Visibility = Visibility.Visible;
+                this.Title = "Skema – Underviser";
+            }
+            else
+            {
+                this.Title = "Skema – Studerende";
+            }
+
             Loaded += (s, e) => { BuildLayout(); PlaceEvents(); };
+        }
+
+        // Knap: Tilføj begivenhed (kun undervisere kan se den)
+        private void TilfoejKnap_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new TilfoejBegivenhedWindow(_dage);
+            dialog.Owner = this;
+
+            if (dialog.ShowDialog() == true)
+            {
+                _events.Add(dialog.NyBlok);
+
+                // Genopbyg skemaet med den nye begivenhed
+                BodyGrid.Children.Clear();
+                foreach (var canvas in _dagCanvases)
+                    if (canvas != null) canvas.Children.Clear();
+
+                BuildLayout();
+                PlaceEvents();
+            }
         }
 
         private void BuildLayout()
         {
-            // Column definitions: time label + 7 day columns
             BodyGrid.ColumnDefinitions.Clear();
             BodyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(TidKolonneB) });
             for (int d = 0; d < _dage.Length; d++)
-            {
                 BodyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            }
 
-            // Row definitions: header + body
             BodyGrid.RowDefinitions.Clear();
-            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });  // header
-            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(TotalH) }); // body
+            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
+            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(TotalH) });
 
-            // ── Header row ────────────────────────────────────────────────────
-            // Empty corner
-            var corner = new Border
-            {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1)
-            };
+            var corner = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1) };
             Grid.SetRow(corner, 0); Grid.SetColumn(corner, 0);
             BodyGrid.Children.Add(corner);
 
             for (int d = 0; d < _dage.Length; d++)
             {
-                var hdr = new Border
-                {
-                    BorderBrush = Brushes.Gray,
-                    BorderThickness = new Thickness(0, 1, 1, 1)
-                };
+                var hdr = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 1, 1, 1) };
                 hdr.Child = new TextBlock
                 {
                     Text = _dage[d],
@@ -80,9 +98,6 @@ namespace projektaflevering
                 BodyGrid.Children.Add(hdr);
             }
 
-            // ── Body row ──────────────────────────────────────────────────────
-
-            // Time label canvas
             var timeCanvas = new Canvas { Width = TidKolonneB, Height = TotalH };
             var timeBorder = new Border
             {
@@ -100,31 +115,26 @@ namespace projektaflevering
                 {
                     Text = $"{h:D2}:00",
                     FontSize = 11,
-                    Foreground = Brushes.Gray
+                    Foreground = Brushes.Gray,
+                    Width = TidKolonneB - 4,
+                    TextAlignment = TextAlignment.Right
                 };
-                lbl.Width = TidKolonneB - 4;
-                lbl.TextAlignment = TextAlignment.Right;
                 Canvas.SetTop(lbl, y - 7);
                 Canvas.SetLeft(lbl, 0);
                 timeCanvas.Children.Add(lbl);
             }
 
-            // Day columns
             for (int d = 0; d < _dage.Length; d++)
             {
                 var canvas = new Canvas { Background = Brushes.White, Height = TotalH };
                 _dagCanvases[d] = canvas;
 
-                // Draw horizontal hour lines
                 for (int h = StartTime; h <= SlutTime; h++)
                 {
                     double y = (h - StartTime) * TimePixelH;
                     var line = new System.Windows.Shapes.Line
                     {
-                        X1 = 0,
-                        Y1 = y,
-                        X2 = 2000,
-                        Y2 = y,   // wide enough; clipped by border
+                        X1 = 0, Y1 = y, X2 = 2000, Y2 = y,
                         Stroke = Brushes.LightGray,
                         StrokeThickness = 1
                     };
@@ -142,7 +152,6 @@ namespace projektaflevering
             }
         }
 
-        // ── Place event blocks on their canvases ──────────────────────────────
         private void PlaceEvents()
         {
             foreach (var ev in _events)
@@ -181,7 +190,6 @@ namespace projektaflevering
                 Canvas.SetTop(block, top);
                 canvas.Children.Add(block);
 
-                // Set width once canvas is measured
                 canvas.SizeChanged += (s, e) =>
                 {
                     if (s is Canvas c)

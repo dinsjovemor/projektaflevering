@@ -1,0 +1,19 @@
+<Window x:Class="projektaflevering.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Log ind" Height="220" Width="320"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <StackPanel Margin="20">
+        <TextBlock Text="Brugernavn:" Margin="0,0,0,4"/>
+        <TextBox x:Name="BrugernavnBox" Margin="0,0,0,12"/>
+
+        <TextBlock Text="Adgangskode:" Margin="0,0,0,4"/>
+        <PasswordBox x:Name="AdgangskodeBox" Margin="0,0,0,16"/>
+
+        <Button Content="Log ind" Click="LogIndKnap_Click"/>
+
+        <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,8,0,0" TextAlignment="Center"/>
+    </StackPanel>
+</Window>
