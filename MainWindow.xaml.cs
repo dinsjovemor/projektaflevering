@@ -8,15 +8,20 @@ namespace projektaflevering
 {
     public partial class MainWindow : Window
     {
+        // Ugens dage
         readonly string[] _dage = { "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag" };
-        int StartTime = 8;
-        int SlutTime = 20;
-        double TimePixelH = 60.0;
-        double TidKolonneB = 50.0;
 
-        double TotalH => (SlutTime - StartTime) * TimePixelH;
+        // Skema-indstillinger
+        int _startKlokken = 8;
+        int _slutKlokken = 20;
+        double _pixelPrTime = 60.0;
+        double _tidskolonneBredte = 50.0;
 
-        readonly List<SkemaBlok> _events = new List<SkemaBlok>
+        // Samlet højde på skemaet i pixels
+        double SamletHøjde => (_slutKlokken - _startKlokken) * _pixelPrTime;
+
+        // Liste over begivenheder i skemaet
+        readonly List<SkemaBlok> _begivenheder = new List<SkemaBlok>
         {
             new SkemaBlok(0,  9, 20, 12, 50, "Software arkitektur"),
             new SkemaBlok(0, 14,  0, 15, 30, "Selvstudie"),
@@ -26,181 +31,230 @@ namespace projektaflevering
             new SkemaBlok(4, 15, 15, 16,  0, "Projekt"),
         };
 
-        readonly Canvas[] _dagCanvases = new Canvas[7];
-        bool _erUnderviser;
+        // Liste over flows (undervisningsemner)
+        readonly List<Flow> _flows = new List<Flow>
+        {
+            new Flow("Introduktion til C#", "Grundlæggende syntaks, variabler og løkker i C#."),
+            new Flow("Objektorienteret programmering", "Klasser, arv og indkapsling."),
+            new Flow("WPF og brugergrænseflader", "Sådan bygges vinduer og knapper med XAML."),
+        };
 
-        // Konstruktør tager imod om brugeren er underviser
-        public MainWindow(bool erUnderviser)
+        // En canvas pr. dag til at tegne begivenheder på
+        readonly Canvas[] _dagCanvasser = new Canvas[7];
+
+        // Den bruger der er logget ind
+        readonly Bruger _bruger;
+
+        // Konstruktør – modtager den bruger der loggede ind
+        public MainWindow(Bruger bruger)
         {
             InitializeComponent();
-            _erUnderviser = erUnderviser;
+            _bruger = bruger;
 
-            // Vis kun "Tilføj begivenhed"-knappen for undervisere
-            if (_erUnderviser)
+            // Vis kun knapper hvis brugeren er en underviser
+            if (_bruger is Underviser)
             {
                 UnderviserPanel.Visibility = Visibility.Visible;
-                this.Title = "Skema – Underviser";
+                this.Title = "Ugeskema – Underviser";
             }
             else
             {
-                this.Title = "Skema – Studerende";
+                this.Title = "Ugeskema – Studerende";
             }
 
-            Loaded += (s, e) => { BuildLayout(); PlaceEvents(); };
+            // Udfyld flow-listen
+            foreach (var flow in _flows)
+                FlowListe.Items.Add(flow);
+
+            Loaded += (s, e) => { BygSkema(); PlacerBegivenheder(); };
         }
 
-        // Knap: Tilføj begivenhed (kun undervisere kan se den)
-        private void TilfoejKnap_Click(object sender, RoutedEventArgs e)
+        // ── Knap: Tilføj begivenhed ──────────────────────────────────────────
+        private void TilfoejBegivenhedKnap_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new TilfoejBegivenhedWindow(_dage);
             dialog.Owner = this;
 
             if (dialog.ShowDialog() == true)
             {
-                _events.Add(dialog.NyBlok);
+                _begivenheder.Add(dialog.NyBlok);
 
-                // Genopbyg skemaet med den nye begivenhed
-                BodyGrid.Children.Clear();
-                foreach (var canvas in _dagCanvases)
+                // Genopbyg skemaet
+                SkemaGrid.Children.Clear();
+                foreach (var canvas in _dagCanvasser)
                     if (canvas != null) canvas.Children.Clear();
 
-                BuildLayout();
-                PlaceEvents();
+                BygSkema();
+                PlacerBegivenheder();
             }
         }
 
-        private void BuildLayout()
+        // ── Knap: Tilføj flow ────────────────────────────────────────────────
+        private void TilfoejFlowKnap_Click(object sender, RoutedEventArgs e)
         {
-            BodyGrid.ColumnDefinitions.Clear();
-            BodyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(TidKolonneB) });
+            var dialog = new TilfoejFlowWindow();
+            dialog.Owner = this;
+
+            if (dialog.ShowDialog() == true)
+            {
+                _flows.Add(dialog.NytFlow);
+                FlowListe.Items.Add(dialog.NytFlow);
+            }
+        }
+
+        // ── Valgt flow i listen – vis detaljer ───────────────────────────────
+        private void FlowListe_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (FlowListe.SelectedItem is Flow valgtFlow)
+            {
+                FlowTitelTekst.Text = valgtFlow.Titel;
+                FlowBeskrivelseTekst.Text = valgtFlow.Beskrivelse;
+            }
+        }
+
+        // ── Byg skemaoversigten ──────────────────────────────────────────────
+        private void BygSkema()
+        {
+            // Kolonner: tidskolonne + 7 dage
+            SkemaGrid.ColumnDefinitions.Clear();
+            SkemaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(_tidskolonneBredte) });
             for (int d = 0; d < _dage.Length; d++)
-                BodyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                SkemaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            BodyGrid.RowDefinitions.Clear();
-            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
-            BodyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(TotalH) });
+            // Rækker: overskrift + indhold
+            SkemaGrid.RowDefinitions.Clear();
+            SkemaGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
+            SkemaGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(SamletHøjde) });
 
-            var corner = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1) };
-            Grid.SetRow(corner, 0); Grid.SetColumn(corner, 0);
-            BodyGrid.Children.Add(corner);
+            // Hjørne (tomt felt øverst til venstre)
+            var hjørne = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1) };
+            Grid.SetRow(hjørne, 0); Grid.SetColumn(hjørne, 0);
+            SkemaGrid.Children.Add(hjørne);
 
+            // Dag-overskrifter
             for (int d = 0; d < _dage.Length; d++)
             {
-                var hdr = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 1, 1, 1) };
-                hdr.Child = new TextBlock
+                var overskrift = new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 1, 1, 1) };
+                overskrift.Child = new TextBlock
                 {
                     Text = _dage[d],
                     FontWeight = FontWeights.SemiBold,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
-                Grid.SetRow(hdr, 0); Grid.SetColumn(hdr, d + 1);
-                BodyGrid.Children.Add(hdr);
+                Grid.SetRow(overskrift, 0); Grid.SetColumn(overskrift, d + 1);
+                SkemaGrid.Children.Add(overskrift);
             }
 
-            var timeCanvas = new Canvas { Width = TidKolonneB, Height = TotalH };
-            var timeBorder = new Border
+            // Tidskolonne (viser klokkeslæt)
+            var tidsCanvas = new Canvas { Width = _tidskolonneBredte, Height = SamletHøjde };
+            var tidsBorder = new Border
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1, 0, 1, 1),
-                Child = timeCanvas
+                Child = tidsCanvas
             };
-            Grid.SetRow(timeBorder, 1); Grid.SetColumn(timeBorder, 0);
-            BodyGrid.Children.Add(timeBorder);
+            Grid.SetRow(tidsBorder, 1); Grid.SetColumn(tidsBorder, 0);
+            SkemaGrid.Children.Add(tidsBorder);
 
-            for (int h = StartTime; h <= SlutTime; h++)
+            for (int t = _startKlokken; t <= _slutKlokken; t++)
             {
-                double y = (h - StartTime) * TimePixelH;
-                var lbl = new TextBlock
+                double y = (t - _startKlokken) * _pixelPrTime;
+                var tidslabel = new TextBlock
                 {
-                    Text = $"{h:D2}:00",
+                    Text = $"{t:D2}:00",
                     FontSize = 11,
                     Foreground = Brushes.Gray,
-                    Width = TidKolonneB - 4,
+                    Width = _tidskolonneBredte - 4,
                     TextAlignment = TextAlignment.Right
                 };
-                Canvas.SetTop(lbl, y - 7);
-                Canvas.SetLeft(lbl, 0);
-                timeCanvas.Children.Add(lbl);
+                Canvas.SetTop(tidslabel, y - 7);
+                Canvas.SetLeft(tidslabel, 0);
+                tidsCanvas.Children.Add(tidslabel);
             }
 
+            // Dag-kolonner
             for (int d = 0; d < _dage.Length; d++)
             {
-                var canvas = new Canvas { Background = Brushes.White, Height = TotalH };
-                _dagCanvases[d] = canvas;
+                var canvas = new Canvas { Background = Brushes.White, Height = SamletHøjde };
+                _dagCanvasser[d] = canvas;
 
-                for (int h = StartTime; h <= SlutTime; h++)
+                // Vandrette linjer pr. time
+                for (int t = _startKlokken; t <= _slutKlokken; t++)
                 {
-                    double y = (h - StartTime) * TimePixelH;
-                    var line = new System.Windows.Shapes.Line
+                    double y = (t - _startKlokken) * _pixelPrTime;
+                    var linje = new System.Windows.Shapes.Line
                     {
                         X1 = 0, Y1 = y, X2 = 2000, Y2 = y,
                         Stroke = Brushes.LightGray,
                         StrokeThickness = 1
                     };
-                    canvas.Children.Add(line);
+                    canvas.Children.Add(linje);
                 }
 
-                var colBorder = new Border
+                var dagBorder = new Border
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(0, 0, 1, 1),
                     Child = canvas
                 };
-                Grid.SetRow(colBorder, 1); Grid.SetColumn(colBorder, d + 1);
-                BodyGrid.Children.Add(colBorder);
+                Grid.SetRow(dagBorder, 1); Grid.SetColumn(dagBorder, d + 1);
+                SkemaGrid.Children.Add(dagBorder);
             }
         }
 
-        private void PlaceEvents()
+        // ── Placer begivenheder på skemaet ───────────────────────────────────
+        private void PlacerBegivenheder()
         {
-            foreach (var ev in _events)
+            foreach (var beg in _begivenheder)
             {
-                var canvas = _dagCanvases[ev.DayIndex];
+                var canvas = _dagCanvasser[beg.DagIndeks];
 
-                double top = TimeToPixel(ev.StartHour, ev.StartMinute);
-                double height = Math.Max(TimeToPixel(ev.EndHour, ev.EndMinute) - top, 16);
+                double top = TidTilPixel(beg.StartTime, beg.StartMinut);
+                double højde = Math.Max(TidTilPixel(beg.SlutTime, beg.SlutMinut) - top, 16);
 
-                var block = new Border
+                var blok = new Border
                 {
                     Background = Brushes.LightSteelBlue,
                     BorderBrush = Brushes.SteelBlue,
                     BorderThickness = new Thickness(1),
-                    Height = height,
+                    Height = højde,
                     Margin = new Thickness(2, 0, 2, 0),
-                    ToolTip = $"{ev.Title}  {ev.StartHour:D2}:{ev.StartMinute:D2}–{ev.EndHour:D2}:{ev.EndMinute:D2}"
+                    ToolTip = $"{beg.Titel}  {beg.StartTime:D2}:{beg.StartMinut:D2}–{beg.SlutTime:D2}:{beg.SlutMinut:D2}"
                 };
 
-                var text = new StackPanel { Margin = new Thickness(4, 2, 4, 2) };
-                text.Children.Add(new TextBlock
+                var indhold = new StackPanel { Margin = new Thickness(4, 2, 4, 2) };
+                indhold.Children.Add(new TextBlock
                 {
-                    Text = ev.Title,
+                    Text = beg.Titel,
                     FontSize = 11,
                     FontWeight = FontWeights.SemiBold,
                     TextWrapping = TextWrapping.Wrap
                 });
-                text.Children.Add(new TextBlock
+                indhold.Children.Add(new TextBlock
                 {
-                    Text = $"{ev.StartHour:D2}:{ev.StartMinute:D2}–{ev.EndHour:D2}:{ev.EndMinute:D2}",
+                    Text = $"{beg.StartTime:D2}:{beg.StartMinut:D2}–{beg.SlutTime:D2}:{beg.SlutMinut:D2}",
                     FontSize = 10,
                     Foreground = Brushes.DimGray
                 });
-                block.Child = text;
+                blok.Child = indhold;
 
-                Canvas.SetTop(block, top);
-                canvas.Children.Add(block);
+                Canvas.SetTop(blok, top);
+                canvas.Children.Add(blok);
 
+                // Justér bredden når kolonnen ændrer størrelse
                 canvas.SizeChanged += (s, e) =>
                 {
                     if (s is Canvas c)
-                        foreach (var child in c.Children)
-                            if (child is Border b)
+                        foreach (var barn in c.Children)
+                            if (barn is Border b)
                                 b.Width = c.ActualWidth - 4;
                 };
             }
         }
 
-        private double TimeToPixel(int hour, int minute)
-            => (hour - StartTime + minute / 60.0) * TimePixelH;
+        // Hjælpemetode: omregn klokkeslæt til pixel-position
+        private double TidTilPixel(int time, int minut)
+            => (time - _startKlokken + minut / 60.0) * _pixelPrTime;
     }
 }

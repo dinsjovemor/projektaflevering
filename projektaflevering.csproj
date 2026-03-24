@@ -55,13 +55,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bruger.cs" />
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SkemaBlok.cs" />
+    <Compile Include="Studerende.cs" />
     <Compile Include="TilfoejBegivenhedWindow.xaml.cs">
       <DependentUpon>TilfoejBegivenhedWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TilfoejFlowWindow.xaml.cs">
+      <DependentUpon>TilfoejFlowWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Underviser.cs" />
     <Page Include="LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -74,13 +80,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="flow.cs" />
-    <Compile Include="forside.cs" />
+    <Compile Include="Flow.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="TilfoejBegivenhedWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TilfoejFlowWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -17,15 +17,17 @@ namespace projektaflevering
             // Underviser-login
             if (brugernavn == "underviser" && adgangskode == "1234")
             {
-                var mainWindow = new MainWindow(erUnderviser: true);
-                mainWindow.Show();
+                Bruger bruger = new Underviser(brugernavn, adgangskode);
+                var hovedvindue = new MainWindow(bruger);
+                hovedvindue.Show();
                 this.Close();
             }
             // Studerende-login
             else if (brugernavn == "studerende" && adgangskode == "1234")
             {
-                var mainWindow = new MainWindow(erUnderviser: false);
-                mainWindow.Show();
+                Bruger bruger = new Studerende(brugernavn, adgangskode);
+                var hovedvindue = new MainWindow(bruger);
+                hovedvindue.Show();
                 this.Close();
             }
             else

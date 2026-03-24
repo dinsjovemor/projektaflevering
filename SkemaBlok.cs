@@ -1,31 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace projektaflevering
 {
     public class SkemaBlok
     {
-        public int DayIndex { get; }
-        public int StartHour { get; }
-        public int StartMinute { get; }
-        public int EndHour { get; }
-        public int EndMinute { get; }
-        public string Title { get; }
+        public int DagIndeks { get; }       // 0 = Mandag, 1 = Tirsdag osv.
+        public int StartTime { get; }
+        public int StartMinut { get; }
+        public int SlutTime { get; }
+        public int SlutMinut { get; }
+        public string Titel { get; }
 
-        public SkemaBlok(int day, int startH, int startM, int endH, int endM, string title)
+        public SkemaBlok(int dagIndeks, int startTime, int startMinut, int slutTime, int slutMinut, string titel)
         {
-            DayIndex = day;
-            StartHour = startH;
-            StartMinute = startM;
-            EndHour = endH;
-            EndMinute = endM;
-            Title = title;
+            DagIndeks = dagIndeks;
+            StartTime = startTime;
+            StartMinut = startMinut;
+            SlutTime = slutTime;
+            SlutMinut = slutMinut;
+            Titel = titel;
         }
-
     }
 }

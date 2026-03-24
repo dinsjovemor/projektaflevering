@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 
 namespace projektaflevering
@@ -20,52 +19,47 @@ namespace projektaflevering
 
         private void TilfoejKnap_Click(object sender, RoutedEventArgs e)
         {
-            // Valider titel
             if (string.IsNullOrWhiteSpace(TitelBox.Text))
             {
                 FejlTekst.Text = "Skriv venligst en titel.";
                 return;
             }
 
-            // Valider start-tid
-            if (!TryParseTid(StartBox.Text, out int startH, out int startM))
+            if (!TryParseTid(StartBox.Text, out int startTime, out int startMinut))
             {
-                FejlTekst.Text = "Ugyldig starttid. Brug formatet HH:MM.";
+                FejlTekst.Text = "Ugyldig starttid. Brug formatet TT:MM.";
                 return;
             }
 
-            // Valider slut-tid
-            if (!TryParseTid(SlutBox.Text, out int slutH, out int slutM))
+            if (!TryParseTid(SlutBox.Text, out int slutTime, out int slutMinut))
             {
-                FejlTekst.Text = "Ugyldig sluttid. Brug formatet HH:MM.";
+                FejlTekst.Text = "Ugyldig sluttid. Brug formatet TT:MM.";
                 return;
             }
 
-            // Tjek at slutten er efter starten
-            if (slutH * 60 + slutM <= startH * 60 + startM)
+            if (slutTime * 60 + slutMinut <= startTime * 60 + startMinut)
             {
                 FejlTekst.Text = "Sluttiden skal være efter starttiden.";
                 return;
             }
 
-            // Alt er OK – opret blok og luk vinduet
-            NyBlok = new SkemaBlok(DagBox.SelectedIndex, startH, startM, slutH, slutM, TitelBox.Text.Trim());
+            NyBlok = new SkemaBlok(DagBox.SelectedIndex, startTime, startMinut, slutTime, slutMinut, TitelBox.Text.Trim());
             DialogResult = true;
             Close();
         }
 
-        // Hjælpemetode til at læse HH:MM
-        private bool TryParseTid(string tekst, out int hour, out int minute)
+        // Hjælpemetode til at læse TT:MM
+        private bool TryParseTid(string tekst, out int time, out int minut)
         {
-            hour = 0;
-            minute = 0;
+            time = 0;
+            minut = 0;
 
             var dele = tekst.Split(':');
             if (dele.Length != 2) return false;
-            if (!int.TryParse(dele[0], out hour)) return false;
-            if (!int.TryParse(dele[1], out minute)) return false;
-            if (hour < 0 || hour > 23) return false;
-            if (minute < 0 || minute > 59) return false;
+            if (!int.TryParse(dele[0], out time)) return false;
+            if (!int.TryParse(dele[1], out minut)) return false;
+            if (time < 0 || time > 23) return false;
+            if (minut < 0 || minut > 59) return false;
 
             return true;
         }
