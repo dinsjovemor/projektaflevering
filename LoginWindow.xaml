@@ -12,7 +12,7 @@
         <TextBlock Text="Adgangskode:" Margin="0,0,0,4"/>
         <PasswordBox x:Name="AdgangskodeBox" Margin="0,0,0,16"/>
 
-        <Button Content="Log ind" Click="LogIndKnap_Click"/>
+        <Button Content="Log ind" Click="LogIndKnap_Click" IsDefault="True"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,8,0,0" TextAlignment="Center"/>
     </StackPanel>

@@ -28,6 +28,7 @@
                 <TextBox x:Name="SlutBox" Text="10:00"/>
             </StackPanel>
         </Grid>
+        <CheckBox x:Name="udgivelsesknap" Content="Udgiv til skemaet"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,0,0,8"/>
 
