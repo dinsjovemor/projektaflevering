@@ -12,6 +12,7 @@
         <TextBlock Text="Beskrivelse:" Margin="0,0,0,4"/>
         <TextBox x:Name="BeskrivelseBox" Height="60" TextWrapping="Wrap"
                  AcceptsReturn="True" Margin="0,0,0,16"/>
+        <CheckBox x:Name="Udgiv" Content="Publicer" Checked="CheckBox_Checked"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,0,0,8"/>
 

@@ -63,5 +63,10 @@ namespace projektaflevering
 
             return true;
         }
+
+        private void udgivelsesknap_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
