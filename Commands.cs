@@ -1,6 +1,6 @@
 namespace projektaflevering
 {
-    // Command pattern: Tilføj begivenhed
+    // Command pattern: TilfÃ¸j begivenhed
     public class TilfoejBegivenhedCommand : ICommand
     {
         private readonly SkemaLager _lager;
@@ -47,7 +47,7 @@ namespace projektaflevering
         public void Execute() => _lager.RedigerBegivenhed(_gammel, _ny);
     }
 
-    // Command pattern: Tilføj flow
+    // Command pattern: TilfÃ¸j flow
     public class TilfoejFlowCommand : ICommand
     {
         private readonly SkemaLager _lager;
@@ -84,15 +84,17 @@ namespace projektaflevering
         private readonly Flow       _flow;
         private readonly string     _nyTitel;
         private readonly string     _nyBeskrivelse;
+        private readonly bool       _nySynlig;
 
-        public RedigerFlowCommand(SkemaLager lager, Flow flow, string nyTitel, string nyBeskrivelse)
+        public RedigerFlowCommand(SkemaLager lager, Flow flow, string nyTitel, string nyBeskrivelse, bool nySynlig)
         {
             _lager         = lager;
             _flow          = flow;
             _nyTitel       = nyTitel;
             _nyBeskrivelse = nyBeskrivelse;
+            _nySynlig      = nySynlig;
         }
 
-        public void Execute() => _lager.RedigerFlow(_flow, _nyTitel, _nyBeskrivelse);
+        public void Execute() => _lager.RedigerFlow(_flow, _nyTitel, _nyBeskrivelse, _nySynlig);
     }
 }

@@ -59,6 +59,7 @@
     <Compile Include="IGemmeStrategy.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="ISkemaObserver.cs" />
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>

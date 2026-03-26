@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace projektaflevering
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, ISkemaObserver
     {
         // ── Konstanter ───────────────────────────────────────────────────────
         readonly string[] _dage = { "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag" };
@@ -45,8 +45,9 @@ namespace projektaflevering
 
             // Observer-mønstret: abonner på ændringer i lageret
             // Når data ændres, opdateres brugergrænsefladen automatisk
-            _lager.EventListChanged += OpdaterSkema;
-            _lager.FlowListChanged += OpdaterFlowListe;
+            // Observer pattern: tilmeld dette vindue som lytter
+            // SkemaLager kalder vores metoder nedenfor når data ændres
+            _lager.TilmeldLytter(this);
 
             // Vis underviser-knapper kun for undervisere
             if (_bruger is Underviser)
@@ -91,12 +92,12 @@ namespace projektaflevering
             BygSkema();
 
             // Placer begivenheder og flows (samme som OpdaterSkema/OpdaterFlowListe)
-            OpdaterSkema();
-            OpdaterFlowListe();
+            BegivenhedListeAendret();
+            FlowListeAendret();
         }
 
-        // ── Observer: opdater skema når data ændres ──────────────────────────
-        private void OpdaterSkema()
+        // Observer pattern: kaldes automatisk af SkemaLager når begivenheder ændres
+        public void BegivenhedListeAendret()
         {
             // Ryd eksisterende blokke fra canvas'erne
             foreach (var canvas in _dagCanvasser)
@@ -109,8 +110,8 @@ namespace projektaflevering
             PlacerBegivenheder();
         }
 
-        // ── Observer: opdater flow-listen når data ændres ────────────────────
-        private void OpdaterFlowListe()
+        // Observer pattern: kaldes automatisk af SkemaLager når flows ændres
+        public void FlowListeAendret()
         {
             FlowListe.Items.Clear();
             foreach (var flow in _lager.Flows)
@@ -177,7 +178,7 @@ namespace projektaflevering
 
                 if (dialog.ShowDialog() == true)
                 {
-                    ICommand kommando = new RedigerFlowCommand(_lager, valgtFlow, dialog.NyTitel, dialog.NyBeskrivelse);
+                    ICommand kommando = new RedigerFlowCommand(_lager, valgtFlow, dialog.NyTitel, dialog.NyBeskrivelse, dialog.NySynlig);
                     kommando.Execute();
 
                     _gemmeStrategi.Gem(_lager);

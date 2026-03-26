@@ -1,7 +1,7 @@
 <Window x:Class="projektaflevering.TilfoejFlowWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Tilføj flow" Height="300" Width="320"
+        Title="Tilføj flow" Height="337" Width="320"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 

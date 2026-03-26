@@ -1,7 +1,7 @@
 <Window x:Class="projektaflevering.RedigerBegivenhedWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rediger begivenhed" Height="320" Width="320"
+        Title="Rediger begivenhed" Height="380" Width="320"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
@@ -30,7 +30,11 @@
         </Grid>
 
         <TextBlock Text="Tilknyttet flow:" Margin="0,0,0,4"/>
-        <ComboBox x:Name="FlowBox" Margin="0,0,0,16"/>
+        <ComboBox x:Name="FlowBox" Margin="0,0,0,12"/>
+
+        <CheckBox x:Name="SynligCheckBox"
+                  Content="Synlig for studerende"
+                  Margin="0,0,0,16"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,0,0,8"/>
         <Button Content="Gem ændringer" Click="GemKnap_Click"/>

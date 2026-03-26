@@ -8,12 +8,9 @@ namespace projektaflevering
         // Den nye SkemaBlok med de redigerede værdier
         public SkemaBlok NyBlok { get; private set; }
 
-        private readonly string[] _dage;
-
         public RedigerBegivenhedWindow(SkemaBlok eksisterende, string[] dage, List<Flow> flows)
         {
             InitializeComponent();
-            _dage = dage;
 
             // Fyld dag-dropdown med dagnavne
             foreach (var dag in dage)
@@ -25,10 +22,11 @@ namespace projektaflevering
                 FlowBox.Items.Add(flow.Titel);
 
             // Udfyld felterne med de eksisterende værdier
-            TitelBox.Text      = eksisterende.Titel;
-            DagBox.SelectedIndex = eksisterende.DagIndeks;
-            StartBox.Text      = $"{eksisterende.StartTime:D2}:{eksisterende.StartMinut:D2}";
-            SlutBox.Text       = $"{eksisterende.SlutTime:D2}:{eksisterende.SlutMinut:D2}";
+            TitelBox.Text            = eksisterende.Titel;
+            DagBox.SelectedIndex     = eksisterende.DagIndeks;
+            StartBox.Text            = $"{eksisterende.StartTime:D2}:{eksisterende.StartMinut:D2}";
+            SlutBox.Text             = $"{eksisterende.SlutTime:D2}:{eksisterende.SlutMinut:D2}";
+            SynligCheckBox.IsChecked = eksisterende.Synlig;
 
             // Vælg det tilknyttede flow i dropdown
             if (!string.IsNullOrEmpty(eksisterende.FlowTitel))
@@ -67,12 +65,15 @@ namespace projektaflevering
             string valgtFlow = FlowBox.SelectedItem?.ToString();
             if (valgtFlow == "(Ingen)") valgtFlow = "";
 
+            bool synlig = SynligCheckBox.IsChecked == true;
+
             NyBlok = new SkemaBlok(
                 DagBox.SelectedIndex,
                 startTime, startMinut,
                 slutTime, slutMinut,
                 TitelBox.Text.Trim(),
-                valgtFlow
+                valgtFlow,
+                synlig
             );
 
             DialogResult = true;
