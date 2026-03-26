@@ -19,14 +19,11 @@ namespace projektaflevering
                 return;
             }
 
-            NytFlow = new Flow(TitelBox.Text.Trim(), BeskrivelseBox.Text.Trim());
+            bool synlig = SynligCheckBox.IsChecked == true;
+
+            NytFlow = new Flow(TitelBox.Text.Trim(), BeskrivelseBox.Text.Trim(), synlig);
             DialogResult = true;
             Close();
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

@@ -1,7 +1,7 @@
-<Window x:Class="projektaflevering.TilfoejBegivenhedWindow"
+<Window x:Class="projektaflevering.RedigerBegivenhedWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Tilføj begivenhed" Height="340" Width="320"
+        Title="Rediger begivenhed" Height="320" Width="320"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
@@ -20,24 +20,19 @@
 
             <StackPanel Grid.Column="0" Margin="0,0,6,0">
                 <TextBlock Text="Start (TT:MM):" Margin="0,0,0,4"/>
-                <TextBox x:Name="StartBox" Text="09:00"/>
+                <TextBox x:Name="StartBox"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1">
                 <TextBlock Text="Slut (TT:MM):" Margin="0,0,0,4"/>
-                <TextBox x:Name="SlutBox" Text="10:00"/>
+                <TextBox x:Name="SlutBox"/>
             </StackPanel>
         </Grid>
 
         <TextBlock Text="Tilknyttet flow:" Margin="0,0,0,4"/>
-        <ComboBox x:Name="FlowBox" Margin="0,0,0,12"/>
-
-        <CheckBox x:Name="SynligCheckBox"
-                  Content="Synlig for studerende"
-                  IsChecked="True"
-                  Margin="0,0,0,16"/>
+        <ComboBox x:Name="FlowBox" Margin="0,0,0,16"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,0,0,8"/>
-        <Button Content="Tilføj" Click="TilfoejKnap_Click"/>
+        <Button Content="Gem ændringer" Click="GemKnap_Click"/>
     </StackPanel>
 </Window>

@@ -3,25 +3,41 @@ using System.Windows;
 
 namespace projektaflevering
 {
-    public partial class TilfoejBegivenhedWindow : Window
+    public partial class RedigerBegivenhedWindow : Window
     {
+        // Den nye SkemaBlok med de redigerede værdier
         public SkemaBlok NyBlok { get; private set; }
 
-        public TilfoejBegivenhedWindow(string[] dage, List<Flow> flows)
+        private readonly string[] _dage;
+
+        public RedigerBegivenhedWindow(SkemaBlok eksisterende, string[] dage, List<Flow> flows)
         {
             InitializeComponent();
+            _dage = dage;
 
+            // Fyld dag-dropdown med dagnavne
             foreach (var dag in dage)
                 DagBox.Items.Add(dag);
-            DagBox.SelectedIndex = 0;
 
+            // Fyld flow-dropdown – første punkt er "Ingen"
             FlowBox.Items.Add("(Ingen)");
             foreach (var flow in flows)
                 FlowBox.Items.Add(flow.Titel);
-            FlowBox.SelectedIndex = 0;
+
+            // Udfyld felterne med de eksisterende værdier
+            TitelBox.Text      = eksisterende.Titel;
+            DagBox.SelectedIndex = eksisterende.DagIndeks;
+            StartBox.Text      = $"{eksisterende.StartTime:D2}:{eksisterende.StartMinut:D2}";
+            SlutBox.Text       = $"{eksisterende.SlutTime:D2}:{eksisterende.SlutMinut:D2}";
+
+            // Vælg det tilknyttede flow i dropdown
+            if (!string.IsNullOrEmpty(eksisterende.FlowTitel))
+                FlowBox.SelectedItem = eksisterende.FlowTitel;
+            else
+                FlowBox.SelectedIndex = 0;
         }
 
-        private void TilfoejKnap_Click(object sender, RoutedEventArgs e)
+        private void GemKnap_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TitelBox.Text))
             {
@@ -47,18 +63,16 @@ namespace projektaflevering
                 return;
             }
 
+            // Bestem valgt flow – "(Ingen)" gemmes som tom streng
             string valgtFlow = FlowBox.SelectedItem?.ToString();
             if (valgtFlow == "(Ingen)") valgtFlow = "";
-
-            bool synlig = SynligCheckBox.IsChecked == true;
 
             NyBlok = new SkemaBlok(
                 DagBox.SelectedIndex,
                 startTime, startMinut,
                 slutTime, slutMinut,
                 TitelBox.Text.Trim(),
-                valgtFlow,
-                synlig
+                valgtFlow
             );
 
             DialogResult = true;

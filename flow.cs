@@ -2,19 +2,21 @@ namespace projektaflevering
 {
     public class Flow
     {
-        public string Titel { get; set; }
+        public string Titel       { get; set; }
         public string Beskrivelse { get; set; }
 
-        public Flow(string titel, string beskrivelse)
+        // Bestemmer om studerende kan se dette flow
+        public bool Synlig { get; set; }
+
+        public Flow() { }
+
+        public Flow(string titel, string beskrivelse, bool synlig = true)
         {
-            Titel = titel;
+            Titel       = titel;
             Beskrivelse = beskrivelse;
+            Synlig      = synlig;
         }
 
-        // Bruges til at vise titlen i listeboksen
-        public override string ToString()
-        {
-            return Titel;
-        }
+        public override string ToString() => Titel;
     }
 }

@@ -1,7 +1,7 @@
-<Window x:Class="projektaflevering.TilfoejFlowWindow"
+<Window x:Class="projektaflevering.RedigerFlowWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Tilføj flow" Height="300" Width="320"
+        Title="Rediger flow" Height="250" Width="320"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
@@ -11,14 +11,9 @@
 
         <TextBlock Text="Beskrivelse:" Margin="0,0,0,4"/>
         <TextBox x:Name="BeskrivelseBox" Height="60" TextWrapping="Wrap"
-                 AcceptsReturn="True" Margin="0,0,0,12"/>
-
-        <CheckBox x:Name="SynligCheckBox"
-                  Content="Synlig for studerende"
-                  IsChecked="True"
-                  Margin="0,0,0,16"/>
+                 AcceptsReturn="True" Margin="0,0,0,16"/>
 
         <TextBlock x:Name="FejlTekst" Foreground="Red" Margin="0,0,0,8"/>
-        <Button Content="Tilføj" Click="TilfoejKnap_Click"/>
+        <Button Content="Gem ændringer" Click="GemKnap_Click"/>
     </StackPanel>
 </Window>

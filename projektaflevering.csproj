@@ -56,11 +56,22 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bruger.cs" />
+    <Compile Include="IGemmeStrategy.cs" />
+    <Compile Include="ICommand.cs" />
+    <Compile Include="Commands.cs" />
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RedigerBegivenhedWindow.xaml.cs">
+      <DependentUpon>RedigerBegivenhedWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RedigerFlowWindow.xaml.cs">
+      <DependentUpon>RedigerFlowWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SkemaBlok.cs" />
+    <Compile Include="SkemaLager.cs" />
     <Compile Include="Studerende.cs" />
+    <Compile Include="TekstfilGemmeStrategy.cs" />
     <Compile Include="TilfoejBegivenhedWindow.xaml.cs">
       <DependentUpon>TilfoejBegivenhedWindow.xaml</DependentUpon>
     </Compile>
@@ -85,6 +96,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RedigerBegivenhedWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RedigerFlowWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="TilfoejBegivenhedWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
